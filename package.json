@@ -1,0 +1,36 @@
+{
+  "name": "cda-backupper",
+  "version": "1.0.0",
+  "description": "Backup the Coach Dave Academy - Delta app - setups",
+  "main": "dist/backup.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/backup.ts",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nandibaa/CDA-backupper.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/nandibaa/CDA-backupper/issues"
+  },
+  "homepage": "https://github.com/nandibaa/CDA-backupper#readme",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.5.0",
+    "jest": "^30.3.0",
+    "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.2"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": ["<rootDir>/src"]
+  }
+}
