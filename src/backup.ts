@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
+import * as dotenv from "dotenv";
 
 /**
  * Configuration for the CDA backup process.
@@ -161,29 +162,37 @@ export function startBackupScheduler(config: BackupConfig): ReturnType<typeof se
 // Entry point – only executed when running the file directly (not in tests)
 // ---------------------------------------------------------------------------
 if (require.main === module) {
-  const args = process.argv.slice(2);
+  // Load .env from the working directory (silent if the file does not exist)
+  dotenv.config();
 
-  if (args.length < 3) {
-    console.error(
-      "Usage: ts-node src/backup.ts <sourcePath> <destinationPath> <intervalSeconds>"
-    );
-    console.error("  sourcePath       – folder where Delta stores setups");
-    console.error("  destinationPath  – folder where backups will be written");
-    console.error("  intervalSeconds  – how often to run the backup (in seconds)");
+  // CLI args take precedence over environment variables
+  const args = process.argv.slice(2);
+  const rawSource      = args[0] ?? process.env["SOURCE_PATH"];
+  const rawDest        = args[1] ?? process.env["DESTINATION_PATH"];
+  const rawInterval    = args[2] ?? process.env["INTERVAL_SECONDS"];
+
+  if (!rawSource || !rawDest || !rawInterval) {
+    console.error("Error: SOURCE_PATH, DESTINATION_PATH and INTERVAL_SECONDS must be set.");
+    console.error("");
+    console.error("Provide them via a .env file (recommended) or as CLI arguments:");
+    console.error("  ts-node src/backup.ts <sourcePath> <destinationPath> <intervalSeconds>");
+    console.error("");
+    console.error("  SOURCE_PATH       – folder where Delta stores setups");
+    console.error("  DESTINATION_PATH  – folder where backups will be written");
+    console.error("  INTERVAL_SECONDS  – how often to run the backup (in seconds)");
     process.exit(1);
   }
 
-  const [sourcePath, destinationPath, intervalArg] = args as [string, string, string];
-  const intervalSeconds = parseInt(intervalArg, 10);
+  const intervalSeconds = parseInt(rawInterval, 10);
 
   if (isNaN(intervalSeconds) || intervalSeconds <= 0) {
-    console.error("Error: intervalSeconds must be a positive integer.");
+    console.error("Error: INTERVAL_SECONDS must be a positive integer.");
     process.exit(1);
   }
 
   const config: BackupConfig = {
-    sourcePath: path.resolve(sourcePath),
-    destinationPath: path.resolve(destinationPath),
+    sourcePath: path.resolve(rawSource),
+    destinationPath: path.resolve(rawDest),
     intervalSeconds,
   };
 
